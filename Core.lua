@@ -88,11 +88,17 @@ do
 
 	local function GetMoneyIconAndString(copperAmount)
 		if copperAmount >= 10000 then
-			return [[Interface\MoneyFrame\UI-GoldIcon]], ("%s %s %s"):format(_G.GOLD_AMOUNT_TEXTURE:format(copperAmount / 10000, 0, 0), _G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
+			local goldAmount = copperAmount / 10000
+			local icon = goldAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_01]] or [[Interface\ICONS\INV_Misc_Coin_02]]
+			return icon, ("%s %s %s"):format(_G.GOLD_AMOUNT_TEXTURE:format(goldAmount, 0, 0), _G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
 		elseif copperAmount >= 100 then
-			return [[Interface\MoneyFrame\UI-SilverIcon]], ("%s %s"):format(_G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
+			local silverAmount = (copperAmount / 100) % 100
+			local icon = silverAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_03]] or [[Interface\ICONS\INV_Misc_Coin_04]]
+			return icon, ("%s %s"):format(_G.SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
 		else
-			return [[Interface\MoneyFrame\UI-CopperIcon]], _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0)
+			local copperAmount = copperAmount % 100
+			local icon = copperAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_05]] or [[Interface\ICONS\INV_Misc_Coin_06]]
+			return icon, _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)
 		end
 	end
 
