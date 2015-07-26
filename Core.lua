@@ -86,13 +86,13 @@ do
 		return MoneyMatch(moneyString, GOLD_PATTERN) * 10000 + MoneyMatch(moneyString, SILVER_PATTERN) * 100 + MoneyMatch(moneyString, COPPER_PATTERN)
 	end
 
-	local function PrettifyCopperAmount(copperAmount)
+	local function GetMoneyIconAndString(copperAmount)
 		if copperAmount >= 10000 then
-			return ("%s %s %s"):format(_G.GOLD_AMOUNT_TEXTURE:format(copperAmount / 10000, 0, 0), _G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
+			return [[Interface\MoneyFrame\UI-GoldIcon]], ("%s %s %s"):format(_G.GOLD_AMOUNT_TEXTURE:format(copperAmount / 10000, 0, 0), _G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
 		elseif copperAmount >= 100 then
-			return ("%s %s"):format(_G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
+			return [[Interface\MoneyFrame\UI-SilverIcon]], ("%s %s"):format(_G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
 		else
-			return _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0)
+			return [[Interface\MoneyFrame\UI-CopperIcon]], _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0)
 		end
 	end
 
@@ -102,6 +102,7 @@ do
 			return
 		end
 
-		LibToast:Spawn(FOLDER_NAME, _G.MONEY, PrettifyCopperAmount(copperAmount), nil, 1, 0, 0)
+		local texturePath, moneyString = GetMoneyIconAndString(copperAmount)
+		LibToast:Spawn(FOLDER_NAME, _G.MONEY, moneyString, texturePath, 1, 0, 0)
 	end
 end -- do-block
