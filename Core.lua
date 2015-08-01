@@ -50,16 +50,23 @@ do
 end -- do-block
 
 do
-	local LOOT_PATTERN = (_G.LOOT_ITEM_SELF):gsub("%%s", "(.+)")
-	local LOOT_MULTIPLE_PATTERN = (_G.LOOT_ITEM_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+	local LOOT_ITEM_PATTERN = (_G.LOOT_ITEM_SELF):gsub("%%s", "(.+)")
+	local LOOT_ITEM_PUSH_PATTERN = (_G.LOOT_ITEM_PUSHED_SELF):gsub("%%s", "(.+)")
+	local LOOT_ITEM_MULTIPLE_PATTERN = (_G.LOOT_ITEM_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+	local LOOT_ITEM_PUSH_MULTIPLE_PATTERN = (_G.LOOT_ITEM_PUSHED_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 
 	function LootToasts:CHAT_MSG_LOOT(eventName, message)
-		local itemLink, amountGained = message:match(LOOT_MULTIPLE_PATTERN)
+		local itemLink, amountGained = message:match(LOOT_ITEM_MULTIPLE_PATTERN)
 		if not itemLink then
-			amountGained, itemLink = 1, message:match(LOOT_PATTERN)
-
+			itemLink, amountGained = message:match(LOOT_ITEM_PUSH_MULTIPLE_PATTERN)
 			if not itemLink then
-				return
+				amountGained, itemLink = 1, message:match(LOOT_ITEM_PATTERN)
+				if not itemLink then
+					amountGained, itemLink = 1, message:match(LOOT_ITEM_PUSH_PATTERN)
+					if not itemLink then
+						return
+					end
+				end
 			end
 		end
 		amountGained = tonumber(amountGained) or 0
