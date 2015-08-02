@@ -37,6 +37,7 @@ function LootToasts:OnEnable()
 
 	self:RegisterEvent("CHAT_MSG_CURRENCY")
 	self:RegisterEvent("CHAT_MSG_LOOT")
+	self:RegisterEvent("CHAT_MSG_SYSTEM")
 	self:RegisterEvent("PLAYER_MONEY")
 end
 
@@ -77,6 +78,25 @@ do
 						return
 					end
 				end
+			end
+		end
+		amountGained = tonumber(amountGained) or 0
+
+		local name, _, quality, _, _, _, _, _, _, texturePath = _G.GetItemInfo(itemLink)
+		LibToast:Spawn(FOLDER_NAME, _G.HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(_G.GetItemCount(itemLink)))
+	end
+end -- do-block
+
+do
+	local QUEST_ITEM_PATTERN = (_G.ERR_QUEST_REWARD_ITEM_S):gsub("%%s", "(.+)")
+	local QUEST_ITEM_MULTIPLE_PATTERN = (_G.ERR_QUEST_REWARD_ITEM_MULT_IS):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+
+	function LootToasts:CHAT_MSG_SYSTEM(eventName, message)
+		local amountGained, itemLink = message:match(QUEST_ITEM_MULTIPLE_PATTERN)
+		if not itemLink then
+			amountGained, itemLink = 1, message:match(QUEST_ITEM_PATTERN)
+			if not itemLink then
+				return
 			end
 		end
 		amountGained = tonumber(amountGained) or 0
