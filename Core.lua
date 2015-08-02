@@ -24,10 +24,20 @@ LibToast:Register(FOLDER_NAME, function(toast, title, text, iconTexture, quality
 	end
 end)
 
+-------------------------------------------------------------------------------
+-- Variables.
+-------------------------------------------------------------------------------
+local CurrentCopperAmount
+
+-------------------------------------------------------------------------------
+-- Event handlers.
+-------------------------------------------------------------------------------
 function LootToasts:OnEnable()
+	CurrentCopperAmount = _G.GetMoney()
+
 	self:RegisterEvent("CHAT_MSG_CURRENCY")
 	self:RegisterEvent("CHAT_MSG_LOOT")
-	self:RegisterEvent("CHAT_MSG_MONEY")
+	self:RegisterEvent("PLAYER_MONEY")
 end
 
 do
@@ -76,46 +86,28 @@ do
 	end
 end -- do-block
 
-do
-	local GOLD_PATTERN = _G.GOLD_AMOUNT:gsub("%%d", "(%%d+)")
-	local SILVER_PATTERN = _G.SILVER_AMOUNT:gsub("%%d", "(%%d+)")
-	local COPPER_PATTERN = _G.COPPER_AMOUNT:gsub("%%d", "(%%d+)")
+function LootToasts:PLAYER_MONEY(eventName)
+	local previousCopperAmount = CurrentCopperAmount
+	CurrentCopperAmount = _G.GetMoney()
 
-	local function MoneyMatch(moneyString, pattern)
-		return moneyString:match(pattern) or 0
-	end
+	local difference = CurrentCopperAmount - previousCopperAmount
+	if difference > 0 then
+		local goldAmount = difference >= 10000 and difference / 10000 or 0
+		local silverAmount = difference >= 100 and (difference / 100) % 100 or 0
+		local copperAmount = difference % 100
+		local texturePath, moneyString
 
-	local function MoneyStringToCopper(moneyString)
-		if not moneyString then
-			return 0
-		end
-
-		return MoneyMatch(moneyString, GOLD_PATTERN) * 10000 + MoneyMatch(moneyString, SILVER_PATTERN) * 100 + MoneyMatch(moneyString, COPPER_PATTERN)
-	end
-
-	local function GetMoneyIconAndString(copperAmount)
-		if copperAmount >= 10000 then
-			local goldAmount = copperAmount / 10000
-			local icon = goldAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_01]] or [[Interface\ICONS\INV_Misc_Coin_02]]
-			return icon, ("%s %s %s"):format(_G.GOLD_AMOUNT_TEXTURE:format(goldAmount, 0, 0), _G.SILVER_AMOUNT_TEXTURE:format((copperAmount / 100) % 100, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
-		elseif copperAmount >= 100 then
-			local silverAmount = (copperAmount / 100) % 100
-			local icon = silverAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_03]] or [[Interface\ICONS\INV_Misc_Coin_04]]
-			return icon, ("%s %s"):format(_G.SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0), _G.COPPER_AMOUNT_TEXTURE:format(copperAmount % 100, 0, 0))
+		if goldAmount > 0 then
+			texturePath = goldAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_01]] or [[Interface\ICONS\INV_Misc_Coin_02]]
+			moneyString = ("%s%s%s"):format(_G.GOLD_AMOUNT_TEXTURE:format(goldAmount, 0, 0), silverAmount > 0 and (" " .. _G.SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0)) or "", copperAmount > 0 and (" " .. _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)) or "")
+		elseif silverAmount > 0 then
+			texturePath = silverAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_03]] or [[Interface\ICONS\INV_Misc_Coin_04]]
+			moneyString = ("%s%s"):format(_G.SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0), copperAmount > 0 and (" " .. _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)) or "")
 		else
-			local copperAmount = copperAmount % 100
-			local icon = copperAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_05]] or [[Interface\ICONS\INV_Misc_Coin_06]]
-			return icon, _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)
-		end
-	end
-
-	function LootToasts:CHAT_MSG_MONEY(eventName, message)
-		local copperAmount = MoneyStringToCopper(message)
-		if not copperAmount or copperAmount <= 0 then
-			return
+			texturePath = copperAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_05]] or [[Interface\ICONS\INV_Misc_Coin_06]]
+			moneyString = _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)
 		end
 
-		local texturePath, moneyString = GetMoneyIconAndString(copperAmount)
 		LibToast:Spawn(FOLDER_NAME, _G.MONEY, moneyString, texturePath, 1, 0, 0)
 	end
-end -- do-block
+end
