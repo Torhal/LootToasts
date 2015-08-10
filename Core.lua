@@ -67,14 +67,14 @@ do
 	local LOOT_ITEM_PUSH_MULTIPLE_PATTERN = (_G.LOOT_ITEM_PUSHED_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 
 	function LootToasts:CHAT_MSG_LOOT(eventName, message)
-		local itemLink, amountGained = message:match(LOOT_ITEM_MULTIPLE_PATTERN)
-		if not itemLink then
-			itemLink, amountGained = message:match(LOOT_ITEM_PUSH_MULTIPLE_PATTERN)
-			if not itemLink then
-				amountGained, itemLink = 1, message:match(LOOT_ITEM_PATTERN)
-				if not itemLink then
-					amountGained, itemLink = 1, message:match(LOOT_ITEM_PUSH_PATTERN)
-					if not itemLink then
+		local hyperLink, amountGained = message:match(LOOT_ITEM_MULTIPLE_PATTERN)
+		if not hyperLink then
+			hyperLink, amountGained = message:match(LOOT_ITEM_PUSH_MULTIPLE_PATTERN)
+			if not hyperLink then
+				amountGained, hyperLink = 1, message:match(LOOT_ITEM_PATTERN)
+				if not hyperLink then
+					amountGained, hyperLink = 1, message:match(LOOT_ITEM_PUSH_PATTERN)
+					if not hyperLink then
 						return
 					end
 				end
@@ -82,8 +82,15 @@ do
 		end
 		amountGained = tonumber(amountGained) or 0
 
-		local name, _, quality, _, _, _, _, _, _, texturePath = _G.GetItemInfo(itemLink)
-		LibToast:Spawn(FOLDER_NAME, _G.HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(_G.GetItemCount(itemLink)))
+		if hyperLink:find("battlepet") then
+			local _, speciesID, _, breedQuality = (":"):split(hyperLink)
+			local name, texturePath = _G.C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+
+			LibToast:Spawn(FOLDER_NAME, _G.TOOLTIP_BATTLE_PET, name, texturePath, breedQuality, amountGained, 0)
+		else
+			local name, _, quality, _, _, _, _, _, _, texturePath = _G.GetItemInfo(hyperLink)
+			LibToast:Spawn(FOLDER_NAME, _G.HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(_G.GetItemCount(hyperLink)))
+		end
 	end
 end -- do-block
 
