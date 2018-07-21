@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80000
 ## Title: LootToasts
 ## Notes: Spawns toasts for looted items, money, and currencies.
 ## Author: Torhal
