@@ -1,6 +1,6 @@
 package-as: LootToasts
 
-enable-nolib-creation: yes
+enable-nolib-creation: no
 
 externals:
     libs/LibStub:
