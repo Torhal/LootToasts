@@ -15,7 +15,8 @@ local LibToast = LibStub("LibToast-1.0")
 local LootToasts = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
 LibToast:Register(FOLDER_NAME, function(toast, title, text, iconTexture, qualityID, amountGained, amountOwned)
-	local _, _, _, hex = _G.GetItemQualityColor(qualityID)
+	local _, _, _, hex = C_Item.GetItemQualityColor(qualityID)
+
 	toast:SetFormattedTitle("%s %s", title, amountGained > 1 and _G.PARENS_TEMPLATE:format(amountGained) or "")
 	toast:SetFormattedText("|c%s%s|r %s", hex, text, amountOwned > 0 and _G.PARENS_TEMPLATE:format(amountOwned) or "")
 
@@ -87,8 +88,9 @@ do
 
 			LibToast:Spawn(FOLDER_NAME, _G.TOOLTIP_BATTLE_PET, name, texturePath, breedQuality, amountGained, 0)
 		else
-			local name, _, quality, _, _, _, _, _, _, texturePath = _G.GetItemInfo(hyperLink)
-			LibToast:Spawn(FOLDER_NAME, _G.HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(_G.GetItemCount(hyperLink)))
+			local name, _, quality, _, _, _, _, _, _, texturePath = C_Item.GetItemInfo(hyperLink)
+
+			LibToast:Spawn(FOLDER_NAME, _G.HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(C_Item.GetItemCount(hyperLink)))
 		end
 	end
 end -- do-block
