@@ -28,7 +28,8 @@ end)
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
-local CurrentCopperAmount
+
+local CurrentCopperAmount = 0
 
 -------------------------------------------------------------------------------
 -- Event handlers.
@@ -80,18 +81,23 @@ do
 
 	function LootToasts:CHAT_MSG_LOOT(eventName, message)
 		local hyperLink, amountGained = message:match(LOOT_ITEM_MULTIPLE_PATTERN)
+
 		if not hyperLink then
 			hyperLink, amountGained = message:match(LOOT_ITEM_PUSH_MULTIPLE_PATTERN)
+
 			if not hyperLink then
 				amountGained, hyperLink = 1, message:match(LOOT_ITEM_PATTERN)
+
 				if not hyperLink then
 					amountGained, hyperLink = 1, message:match(LOOT_ITEM_PUSH_PATTERN)
+
 					if not hyperLink then
 						return
 					end
 				end
 			end
 		end
+
 		amountGained = tonumber(amountGained) or 0
 
 		if hyperLink:find("battlepet") then
@@ -112,6 +118,7 @@ function LootToasts:PLAYER_MONEY(eventName)
 	CurrentCopperAmount = _G.GetMoney()
 
 	local difference = CurrentCopperAmount - previousCopperAmount
+
 	if difference > 0 then
 		local goldAmount = difference >= 10000 and difference / 10000 or 0
 		local silverAmount = difference >= 100 and (difference / 100) % 100 or 0
