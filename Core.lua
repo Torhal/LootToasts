@@ -47,6 +47,7 @@ do
 
 	function LootToasts:CHAT_MSG_CURRENCY(eventName, message)
 		local currencyLink, amountGained = message:match(CURRENCY_MULTIPLE_PATTERN)
+
 		if not currencyLink then
 			amountGained, currencyLink = 1, message:match(CURRENCY_PATTERN)
 
@@ -55,8 +56,19 @@ do
 			end
 		end
 
-		local name, amountOwned, texturePath = _G.GetCurrencyInfo(tonumber(currencyLink:match("currency:(%d+)")))
-		LibToast:Spawn(FOLDER_NAME, _G.CURRENCY, name, texturePath, 1, tonumber(amountGained), tonumber(amountOwned))
+		local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(
+			tonumber(currencyLink:match("currency:(%d+)")) or 0
+		)
+
+		LibToast:Spawn(
+			FOLDER_NAME,
+			_G.CURRENCY,
+			currencyInfo.name,
+			currencyInfo.iconFileID,
+			1,
+			tonumber(amountGained),
+			tonumber(currencyInfo.quantity)
+		)
 	end
 end -- do-block
 
