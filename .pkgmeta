@@ -14,5 +14,5 @@ externals:
     libs/AceAddon-3.0:
         url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceAddon-3.0
     libs/LibToast-1.0:
-      url: http://hg.curseforge.net/wow/libtoast-1-0/mainline
+      url: https://repos.curseforge.com/wow/libtoast-1-0 
       tag: latest
