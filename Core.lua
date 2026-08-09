@@ -1,24 +1,16 @@
------------------------------------------------------------------------
--- Upvalued Lua API.
------------------------------------------------------------------------
-local _G = getfenv(0)
-
-local tonumber = _G.tonumber
-
 -------------------------------------------------------------------------------
 -- AddOn namespace.
 -------------------------------------------------------------------------------
 local FOLDER_NAME, private = ...
 
-local LibStub = _G.LibStub
 local LibToast = LibStub("LibToast-1.0")
 local LootToasts = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
 LibToast:Register(FOLDER_NAME, function(toast, title, text, iconTexture, qualityID, amountGained, amountOwned)
 	local _, _, _, hex = C_Item.GetItemQualityColor(qualityID)
 
-	toast:SetFormattedTitle("%s %s", title, amountGained > 1 and _G.PARENS_TEMPLATE:format(amountGained) or "")
-	toast:SetFormattedText("|c%s%s|r %s", hex, text, amountOwned > 0 and _G.PARENS_TEMPLATE:format(amountOwned) or "")
+	toast:SetFormattedTitle("%s %s", title, amountGained > 1 and PARENS_TEMPLATE:format(amountGained) or "")
+	toast:SetFormattedText("|c%s%s|r %s", hex, text, amountOwned > 0 and PARENS_TEMPLATE:format(amountOwned) or "")
 
 	if iconTexture then
 		toast:SetIconTexture(iconTexture)
@@ -35,7 +27,7 @@ local CurrentCopperAmount = 0
 -- Event handlers.
 -------------------------------------------------------------------------------
 function LootToasts:OnEnable()
-	CurrentCopperAmount = _G.GetMoney()
+	CurrentCopperAmount = GetMoney()
 
 	self:RegisterEvent("CHAT_MSG_CURRENCY")
 	self:RegisterEvent("CHAT_MSG_LOOT")
@@ -43,8 +35,8 @@ function LootToasts:OnEnable()
 end
 
 do
-	local CURRENCY_PATTERN = (_G.CURRENCY_GAINED):gsub("%%s", "(.+)")
-	local CURRENCY_MULTIPLE_PATTERN = (_G.CURRENCY_GAINED_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+	local CURRENCY_PATTERN = (CURRENCY_GAINED):gsub("%%s", "(.+)")
+	local CURRENCY_MULTIPLE_PATTERN = (CURRENCY_GAINED_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 
 	function LootToasts:CHAT_MSG_CURRENCY(eventName, message)
 		local currencyLink, amountGained = message:match(CURRENCY_MULTIPLE_PATTERN)
@@ -63,7 +55,7 @@ do
 
 		LibToast:Spawn(
 			FOLDER_NAME,
-			_G.CURRENCY,
+			CURRENCY,
 			currencyInfo.name,
 			currencyInfo.iconFileID,
 			1,
@@ -74,10 +66,10 @@ do
 end -- do-block
 
 do
-	local LOOT_ITEM_PATTERN = (_G.LOOT_ITEM_SELF):gsub("%%s", "(.+)")
-	local LOOT_ITEM_PUSH_PATTERN = (_G.LOOT_ITEM_PUSHED_SELF):gsub("%%s", "(.+)")
-	local LOOT_ITEM_MULTIPLE_PATTERN = (_G.LOOT_ITEM_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
-	local LOOT_ITEM_PUSH_MULTIPLE_PATTERN = (_G.LOOT_ITEM_PUSHED_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+	local LOOT_ITEM_PATTERN = (LOOT_ITEM_SELF):gsub("%%s", "(.+)")
+	local LOOT_ITEM_PUSH_PATTERN = (LOOT_ITEM_PUSHED_SELF):gsub("%%s", "(.+)")
+	local LOOT_ITEM_MULTIPLE_PATTERN = (LOOT_ITEM_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
+	local LOOT_ITEM_PUSH_MULTIPLE_PATTERN = (LOOT_ITEM_PUSHED_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 
 	function LootToasts:CHAT_MSG_LOOT(eventName, message)
 		local hyperLink, amountGained = message:match(LOOT_ITEM_MULTIPLE_PATTERN)
@@ -102,20 +94,20 @@ do
 
 		if hyperLink:find("battlepet") then
 			local _, speciesID, _, breedQuality = (":"):split(hyperLink)
-			local name, texturePath = _G.C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+			local name, texturePath = C_PetJournal.GetPetInfoBySpeciesID(tonumber(speciesID) or 0)
 
-			LibToast:Spawn(FOLDER_NAME, _G.TOOLTIP_BATTLE_PET, name, texturePath, breedQuality, amountGained, 0)
+			LibToast:Spawn(FOLDER_NAME, TOOLTIP_BATTLE_PET, name, texturePath, breedQuality, amountGained, 0)
 		else
 			local name, _, quality, _, _, _, _, _, _, texturePath = C_Item.GetItemInfo(hyperLink)
 
-			LibToast:Spawn(FOLDER_NAME, _G.HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(C_Item.GetItemCount(hyperLink)))
+			LibToast:Spawn(FOLDER_NAME, HELPFRAME_ITEM_TITLE, name, texturePath, quality, amountGained, amountGained + tonumber(C_Item.GetItemCount(hyperLink)))
 		end
 	end
 end -- do-block
 
 function LootToasts:PLAYER_MONEY(eventName)
 	local previousCopperAmount = CurrentCopperAmount
-	CurrentCopperAmount = _G.GetMoney()
+	CurrentCopperAmount = GetMoney()
 
 	local difference = CurrentCopperAmount - previousCopperAmount
 
@@ -127,15 +119,15 @@ function LootToasts:PLAYER_MONEY(eventName)
 
 		if goldAmount > 0 then
 			texturePath = goldAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_01]] or [[Interface\ICONS\INV_Misc_Coin_02]]
-			moneyString = ("%s%s%s"):format(_G.GOLD_AMOUNT_TEXTURE:format(goldAmount, 0, 0), silverAmount > 0 and (" " .. _G.SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0)) or "", copperAmount > 0 and (" " .. _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)) or "")
+			moneyString = ("%s%s%s"):format(GOLD_AMOUNT_TEXTURE:format(goldAmount, 0, 0), silverAmount > 0 and (" " .. SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0)) or "", copperAmount > 0 and (" " .. COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)) or "")
 		elseif silverAmount > 0 then
 			texturePath = silverAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_03]] or [[Interface\ICONS\INV_Misc_Coin_04]]
-			moneyString = ("%s%s"):format(_G.SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0), copperAmount > 0 and (" " .. _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)) or "")
+			moneyString = ("%s%s"):format(SILVER_AMOUNT_TEXTURE:format(silverAmount, 0, 0), copperAmount > 0 and (" " .. COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)) or "")
 		else
 			texturePath = copperAmount < 10 and [[Interface\ICONS\INV_Misc_Coin_05]] or [[Interface\ICONS\INV_Misc_Coin_06]]
-			moneyString = _G.COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)
+			moneyString = COPPER_AMOUNT_TEXTURE:format(copperAmount, 0, 0)
 		end
 
-		LibToast:Spawn(FOLDER_NAME, _G.MONEY, moneyString, texturePath, 1, 0, 0)
+		LibToast:Spawn(FOLDER_NAME, MONEY, moneyString, texturePath, 1, 0, 0)
 	end
 end
