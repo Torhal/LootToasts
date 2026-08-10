@@ -2,10 +2,18 @@
 -- AddOn namespace.
 -------------------------------------------------------------------------------
 local FOLDER_NAME, private = ...
+-- local AddOnFolderName = ... ---@type string
 
 local LibToast = LibStub("LibToast-1.0")
 local LootToasts = LibStub("AceAddon-3.0"):NewAddon(FOLDER_NAME, "AceEvent-3.0")
 
+---@param toast LibToast-1.0.ToastProxy
+---@param title string
+---@param text string
+---@param iconTexture number | string
+---@param qualityID number
+---@param amountGained number
+---@param amountOwned number
 LibToast:Register(FOLDER_NAME, function(toast, title, text, iconTexture, qualityID, amountGained, amountOwned)
 	local _, _, _, hex = C_Item.GetItemQualityColor(qualityID)
 
@@ -38,6 +46,8 @@ do
 	local CURRENCY_PATTERN = (CURRENCY_GAINED):gsub("%%s", "(.+)")
 	local CURRENCY_MULTIPLE_PATTERN = (CURRENCY_GAINED_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 
+	---@param eventName string
+	---@param message string
 	function LootToasts:CHAT_MSG_CURRENCY(eventName, message)
 		local currencyLink, amountGained = message:match(CURRENCY_MULTIPLE_PATTERN)
 
@@ -71,6 +81,8 @@ do
 	local LOOT_ITEM_MULTIPLE_PATTERN = (LOOT_ITEM_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 	local LOOT_ITEM_PUSH_MULTIPLE_PATTERN = (LOOT_ITEM_PUSHED_SELF_MULTIPLE):gsub("%%s", "(.+)"):gsub("%%d", "(%%d+)")
 
+	---@param eventName string
+	---@param message string
 	function LootToasts:CHAT_MSG_LOOT(eventName, message)
 		local hyperLink, amountGained = message:match(LOOT_ITEM_MULTIPLE_PATTERN)
 
@@ -105,6 +117,7 @@ do
 	end
 end -- do-block
 
+---@param eventName string
 function LootToasts:PLAYER_MONEY(eventName)
 	local previousCopperAmount = CurrentCopperAmount
 	CurrentCopperAmount = GetMoney()
