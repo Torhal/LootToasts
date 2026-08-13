@@ -3,12 +3,14 @@
 ## Notes: Spawns toasts for looted items, money, and currencies.
 ## Author: Torhal
 ## Version: @project-version@
-## X-Revision: @project-abbreviated-hash@
-## X-Date: @file-date-iso@
-
 ## OptionalDeps: Ace3, LibToast-1.0
 ## LoadManagers: AddonLoader
+
+## X-Date: @file-date-iso@
 ## X-LoadOn-Always: Delayed
+## X-Revision: @project-abbreviated-hash@
+## X-Curse-Project-ID: 93818
+## X-WoWI-ID: 23638
 
 embeds.xml
 
